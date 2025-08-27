@@ -6,7 +6,7 @@ from datetime import datetime  # For handling dates and times
 
 # This is the foundation for all our table classes
 Base = declarative_base()
-# USER TABLE - Stores information about each person using the app
+# USER TABLE - Stores information about people using the app
 class User(Base):
     __tablename__ = 'users'  # Actual table name in database
     
@@ -39,3 +39,21 @@ class Nutrition(Base):
     
     def __repr__(self):
         return f"<Nutrition(food='{self.food}', calories={self.calories}, timestamp={self.timestamp})>"
+    
+# EXERCISE TABLE - Tracks workout sessions# EXERCISE TABLE - Tracks workout sessions
+class Exercise(Base):
+    __tablename__ = 'exercise'
+    
+    id = Column(Integer, primary_key=True)  # Unique ID for each workout
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)  # Which user did this workout
+    type = Column(String(100), nullable=False)  # Type of exercise (running, swimming, etc.)
+    duration = Column(Integer, nullable=False)  # How long in minutes
+    calories_burned = Column(Float, nullable=False)  # Estimated calories burned
+    notes = Column(Text)  # Optional extra notes about the workout
+    timestamp = Column(DateTime, default=datetime.utcnow)  # When workout happened (auto-filled)
+    
+    # RELATIONSHIP - Connect back to the user
+    user = relationship("User", back_populates="exercise_sessions")
+    
+    def __repr__(self):
+        return f"<Exercise(type='{self.type}', duration={self.duration}, calories_burned={self.calories_burned})>"
