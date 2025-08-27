@@ -105,3 +105,34 @@ def get_exercise_sessions(session: Session, user_id: int, date_str: str = None):
         except ValueError:
             pass
     return query.order_by(Exercise.timestamp.desc()).all()
+
+# HEALTH METRIC CRUD OPERATIONS
+
+def add_health_metric(session: Session, user_id: int, weight: float = None, 
+                     blood_pressure: str = None, heart_rate: int = None, notes: str = None):
+    """Add health measurements for a user"""
+    health_metric = HealthMetric(
+        user_id=user_id,
+        weight=weight,
+        blood_pressure=blood_pressure,
+        heart_rate=heart_rate,
+        notes=notes
+    )
+    session.add(health_metric)
+    session.commit()
+    session.refresh(health_metric)
+    return health_metric
+
+def get_health_metrics(session: Session, user_id: int, date_str: str = None):
+    """Get health measurements for a user, optionally for a specific date"""
+    query = session.query(HealthMetric).filter(HealthMetric.user_id == user_id)
+    if date_str:
+        try:
+            target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            query = query.filter(
+                HealthMetric.timestamp >= datetime.combine(target_date, datetime.min.time()),
+                HealthMetric.timestamp <= datetime.combine(target_date, datetime.max.time())
+            )
+        except ValueError:
+            pass
+    return query.order_by(HealthMetric.timestamp.desc()).all()
