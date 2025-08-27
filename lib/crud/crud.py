@@ -42,3 +42,35 @@ def delete_user(session: Session, user_id: int):
         session.commit()
         return True
     return False
+
+# NUTRITION CRUD OPERATIONS
+
+def add_nutrition_entry(session: Session, user_id: int, food: str, calories: float, 
+                       protein: float = 0, carbs: float = 0, fat: float = 0):
+    """Add a food entry for a user"""
+    nutrition = Nutrition(
+        user_id=user_id,
+        food=food,
+        calories=calories,
+        protein=protein,
+        carbs=carbs,
+        fat=fat
+    )
+    session.add(nutrition)
+    session.commit()
+    session.refresh(nutrition)
+    return nutrition
+
+def get_nutrition_entries(session: Session, user_id: int, date_str: str = None):
+    """Get food entries for a user, optionally for a specific date"""
+    query = session.query(Nutrition).filter(Nutrition.user_id == user_id)
+    if date_str:
+        try:
+            target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            query = query.filter(
+                Nutrition.timestamp >= datetime.combine(target_date, datetime.min.time()),
+                Nutrition.timestamp <= datetime.combine(target_date, datetime.max.time())
+            )
+        except ValueError:
+            pass
+    return query.order_by(Nutrition.timestamp.desc()).all()
