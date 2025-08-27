@@ -74,3 +74,34 @@ def get_nutrition_entries(session: Session, user_id: int, date_str: str = None):
         except ValueError:
             pass
     return query.order_by(Nutrition.timestamp.desc()).all()
+
+# EXERCISE CRUD OPERATIONS
+
+def add_exercise_session(session: Session, user_id: int, type: str, duration: int, 
+                        calories_burned: float, notes: str = None):
+    """Add an exercise session for a user"""
+    exercise = Exercise(
+        user_id=user_id,
+        type=type,
+        duration=duration,
+        calories_burned=calories_burned,
+        notes=notes
+    )
+    session.add(exercise)
+    session.commit()
+    session.refresh(exercise)
+    return exercise
+
+def get_exercise_sessions(session: Session, user_id: int, date_str: str = None):
+    """Get exercise sessions for a user, optionally for a specific date"""
+    query = session.query(Exercise).filter(Exercise.user_id == user_id)
+    if date_str:
+        try:
+            target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            query = query.filter(
+                Exercise.timestamp >= datetime.combine(target_date, datetime.min.time()),
+                Exercise.timestamp <= datetime.combine(target_date, datetime.max.time())
+            )
+        except ValueError:
+            pass
+    return query.order_by(Exercise.timestamp.desc()).all()
