@@ -59,3 +59,21 @@ class Exercise(Base):
     
     def __repr__(self):
         return f"<Exercise(type='{self.type}', duration={self.duration}, calories_burned={self.calories_burned})>"
+    
+    # HEALTH METRICS TABLE - Tracks health measurements over time
+class HealthMetric(Base):
+    __tablename__ = 'health_metrics'
+    
+    id = Column(Integer, primary_key=True)  # Unique ID
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False) 
+    weight = Column(Float) 
+    blood_pressure = Column(String(20))  
+    heart_rate = Column(Integer)  
+    notes = Column(Text)  
+    timestamp = Column(DateTime, default=datetime.utcnow)  
+    
+    # RELATIONSHIP - Connect back to the user
+    user = relationship("User", back_populates="health_metrics")
+    
+    def __repr__(self):
+        return f"<HealthMetric(weight={self.weight}, blood_pressure='{self.blood_pressure}', heart_rate={self.heart_rate})>"
