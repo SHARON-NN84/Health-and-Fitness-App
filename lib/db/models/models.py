@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base  # For creating our tabl
 from sqlalchemy.orm import relationship  # For connecting tables together
 from datetime import datetime  # For handling dates and times
 
-# This is the foundation for all table classes
+# This is the fondation for all table classes
 Base = declarative_base()
 
 # USER TABLE - Stores infor about each person using the app
@@ -41,3 +41,21 @@ class Nutrition(Base):
     
     def __repr__(self):
         return f"<Nutrition(food='{self.food}', calories={self.calories}, timestamp={self.timestamp})>"
+    
+   # EXERCISE TABLE - Tracks workout sessions
+class Exercise(Base):
+    __tablename__ = 'exercise'
+    
+    id = Column(Integer, primary_key=True)  
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)  
+    type = Column(String(100), nullable=False)  
+    duration = Column(Integer, nullable=False)  
+    calories_burned = Column(Float, nullable=False) 
+    notes = Column(Text)  
+    timestamp = Column(DateTime, default=datetime.utcnow) 
+    
+    # RELATIONSHIP - Connect back to the user
+    user = relationship("User", back_populates="exercise_sessions")
+    
+    def __repr__(self):
+        return f"<Exercise(type='{self.type}', duration={self.duration}, calories_burned={self.calories_burned})>"
