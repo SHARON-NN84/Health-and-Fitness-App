@@ -1,8 +1,8 @@
 # Import database building blocks from SQLAlchemy
 from sqlalchemy import Column, Integer, String, Float, DateTime, Text, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base  # For creating our table classes
-from sqlalchemy.orm import relationship  # For connecting tables together
-from datetime import datetime  # For handling dates and times
+from sqlalchemy.ext.declarative import declarative_base  #  creating our table classes
+from sqlalchemy.orm import relationship  #  connecting tables together
+from datetime import datetime  # handling dates and times
 
 # This is the foundation for all our table classes
 Base = declarative_base()
@@ -10,13 +10,13 @@ Base = declarative_base()
 class User(Base):
     __tablename__ = 'users'  # Actual table name in database
     
-    # COLUMNS (like Excel spreadsheet columns)
+    # COLUMNS 
     id = Column(Integer, primary_key=True)  # Unique ID for each user
-    name = Column(String(100), nullable=False)  # User's name 
-    age = Column(Integer, nullable=False)  # User's age (required)
-    weight = Column(Float, nullable=False)  # User's weight (required)
-    height = Column(Float, nullable=False)  # User's height (required)
-    created_at = Column(DateTime, default=datetime.utcnow)  # When user was created
+    name = Column(String(100), nullable=False) 
+    age = Column(Integer, nullable=False)  
+    weight = Column(Float, nullable=False)  
+    height = Column(Float, nullable=False) 
+    created_at = Column(DateTime, default=datetime.utcnow)  
     
     # This makes user objects display nicely when printed
     def __repr__(self):
@@ -27,12 +27,12 @@ class Nutrition(Base):
     
     id = Column(Integer, primary_key=True)  # Unique ID for each food entry
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)  # Which user this belongs to
-    food = Column(String(200), nullable=False)  # What food was eatn
-    calories = Column(Float, nullable=False)  # How many calores
-    protein = Column(Float, default=0)  # Protein content (optional, defaults to 0)
-    carbs = Column(Float, default=0)  # Carbohydrates content (optional)
-    fat = Column(Float, default=0)  # Fat content (optional)
-    timestamp = Column(DateTime, default=datetime.utcnow)  # When the food was logged 
+    food = Column(String(200), nullable=False) 
+    calories = Column(Float, nullable=False)  
+    protein = Column(Float, default=0)  
+    carbs = Column(Float, default=0) 
+    fat = Column(Float, default=0)  
+    timestamp = Column(DateTime, default=datetime.utcnow)  
     
     # RELATIONSHIP - Connect back to the user who owns this food entry
     user = relationship("User", back_populates="nutrition_entries")
@@ -40,20 +40,38 @@ class Nutrition(Base):
     def __repr__(self):
         return f"<Nutrition(food='{self.food}', calories={self.calories}, timestamp={self.timestamp})>"
     
-# EXERCISE TABLE - Tracks workout sessions# EXERCISE TABLE - Tracks workout sessions
+# EXERCISE TABLE - Tracks workout sessions
 class Exercise(Base):
     __tablename__ = 'exercise'
     
-    id = Column(Integer, primary_key=True)  # Unique ID for each workout
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)  # Which user did this workout
-    type = Column(String(100), nullable=False)  # Type of exercise (running, swimming, etc.)
-    duration = Column(Integer, nullable=False)  # How long in minutes
-    calories_burned = Column(Float, nullable=False)  # Estimated calories burned
-    notes = Column(Text)  # Optional extra notes about the workout
-    timestamp = Column(DateTime, default=datetime.utcnow)  # When workout happened (auto-filled)
+    id = Column(Integer, primary_key=True) 
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)  
+    type = Column(String(100), nullable=False)  
+    duration = Column(Integer, nullable=False) 
+    calories_burned = Column(Float, nullable=False)  
+    notes = Column(Text)  
+    timestamp = Column(DateTime, default=datetime.utcnow)  
     
     # RELATIONSHIP - Connect back to the user
     user = relationship("User", back_populates="exercise_sessions")
     
     def __repr__(self):
         return f"<Exercise(type='{self.type}', duration={self.duration}, calories_burned={self.calories_burned})>"
+    
+# HEALTH METRICS TABLE - Tracks health measurements over time
+class HealthMetric(Base):
+    __tablename__ = 'health_metrics'
+    
+    id = Column(Integer, primary_key=True) 
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)  
+    weight = Column(Float)  
+    blood_pressure = Column(String(20))  
+    heart_rate = Column(Integer)  
+    notes = Column(Text) 
+    timestamp = Column(DateTime, default=datetime.utcnow)  
+    
+    # RELATIONSHIP - Connect back to the user
+    user = relationship("User", back_populates="health_metrics")
+    
+    def __repr__(self):
+        return f"<HealthMetric(weight={self.weight}, blood_pressure='{self.blood_pressure}', heart_rate={self.heart_rate})>"

@@ -1,13 +1,10 @@
 # Import necessary modules
-from sqlalchemy.orm import Session
 from datetime import datetime, date
+from db.models.models import User, Nutrition, Exercise, HealthMetric, session
 
-# Import our database table models (like blueprints for our data)
-from db.models.models import User, Nutrition, Exercise, HealthMetric
+# USER OPERATIONS
 
-# USER CRUD OPERATIONS (Create, Read, Update, Delete)
-
-def create_user(session: Session, name: str, age: int, weight: float, height: float):
+def create_user(name: str, age: int, weight: float, height: float):
     """Create a new user and save to database"""
     user = User(name=name, age=age, weight=weight, height=height)
     session.add(user)
@@ -15,15 +12,15 @@ def create_user(session: Session, name: str, age: int, weight: float, height: fl
     session.refresh(user)
     return user
 
-def get_user(session: Session, user_id: int):
+def get_user(user_id: int):
     """Find and return a specific user by their ID"""
     return session.query(User).filter(User.id == user_id).first()
 
-def get_all_users(session: Session):
+def get_all_users():
     """Get all users from the database"""
     return session.query(User).all()
 
-def update_user(session: Session, user_id: int, **kwargs):
+def update_user(user_id: int, **kwargs):
     """Update user information - you can pass any user attributes to change"""
     user = session.query(User).filter(User.id == user_id).first()
     if user:
@@ -34,7 +31,7 @@ def update_user(session: Session, user_id: int, **kwargs):
         session.refresh(user)
     return user
 
-def delete_user(session: Session, user_id: int):
+def delete_user(user_id: int):
     """Delete a user from the database"""
     user = session.query(User).filter(User.id == user_id).first()
     if user:
@@ -45,7 +42,7 @@ def delete_user(session: Session, user_id: int):
 
 # NUTRITION CRUD OPERATIONS
 
-def add_nutrition_entry(session: Session, user_id: int, food: str, calories: float, 
+def add_nutrition_entry(user_id: int, food: str, calories: float, 
                        protein: float = 0, carbs: float = 0, fat: float = 0):
     """Add a food entry for a user"""
     nutrition = Nutrition(
@@ -61,7 +58,7 @@ def add_nutrition_entry(session: Session, user_id: int, food: str, calories: flo
     session.refresh(nutrition)
     return nutrition
 
-def get_nutrition_entries(session: Session, user_id: int, date_str: str = None):
+def get_nutrition_entries(user_id: int, date_str: str = None):
     """Get food entries for a user, optionally for a specific date"""
     query = session.query(Nutrition).filter(Nutrition.user_id == user_id)
     if date_str:
@@ -75,9 +72,9 @@ def get_nutrition_entries(session: Session, user_id: int, date_str: str = None):
             pass
     return query.order_by(Nutrition.timestamp.desc()).all()
 
-# EXERCISE CRUD OPERATIONS
+# EXERCISE OPERATIONS
 
-def add_exercise_session(session: Session, user_id: int, type: str, duration: int, 
+def add_exercise_session(user_id: int, type: str, duration: int, 
                         calories_burned: float, notes: str = None):
     """Add an exercise session for a user"""
     exercise = Exercise(
@@ -92,7 +89,7 @@ def add_exercise_session(session: Session, user_id: int, type: str, duration: in
     session.refresh(exercise)
     return exercise
 
-def get_exercise_sessions(session: Session, user_id: int, date_str: str = None):
+def get_exercise_sessions(user_id: int, date_str: str = None):
     """Get exercise sessions for a user, optionally for a specific date"""
     query = session.query(Exercise).filter(Exercise.user_id == user_id)
     if date_str:
@@ -108,7 +105,7 @@ def get_exercise_sessions(session: Session, user_id: int, date_str: str = None):
 
 # HEALTH METRIC CRUD OPERATIONS
 
-def add_health_metric(session: Session, user_id: int, weight: float = None, 
+def add_health_metric(user_id: int, weight: float = None, 
                      blood_pressure: str = None, heart_rate: int = None, notes: str = None):
     """Add health measurements for a user"""
     health_metric = HealthMetric(
@@ -123,7 +120,7 @@ def add_health_metric(session: Session, user_id: int, weight: float = None,
     session.refresh(health_metric)
     return health_metric
 
-def get_health_metrics(session: Session, user_id: int, date_str: str = None):
+def get_health_metrics(user_id: int, date_str: str = None):
     """Get health measurements for a user, optionally for a specific date"""
     query = session.query(HealthMetric).filter(HealthMetric.user_id == user_id)
     if date_str:

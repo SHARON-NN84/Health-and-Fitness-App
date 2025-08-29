@@ -1,12 +1,15 @@
 # Import database building blocks from SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float, DateTime, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DateTime, Text, ForeignKey , create_engine  # For creating tables and columns
 from sqlalchemy.ext.declarative import declarative_base  # For creating our table classes
-from sqlalchemy.orm import relationship  # For connecting tables together
-from datetime import datetime  # For handling dates and times
+from sqlalchemy.orm import relationship, sessionmaker  # connecting tables together
+from datetime import datetime  #  handling dates and times
+
 
 # This is the fondation for all table classes
 Base = declarative_base()
-
+engine = create_engine('sqlite:///health_fitness.db')
+SessionLocal = sessionmaker(bind=engine)
+session = SessionLocal()
 # USER TABLE - Stores infor about each person using the app
 class User(Base):
     __tablename__ = 'users'  # Actual table name in database
@@ -17,7 +20,7 @@ class User(Base):
     age = Column(Integer, nullable=False)  
     weight = Column(Float, nullable=False) 
     height = Column(Float, nullable=False) 
-    created_at = Column(DateTime, default=datetime.utcnow)  # When user was created (auto-filled)
+    created_at = Column(DateTime, default=datetime.now)  # When user was created (auto-filled)
     
     # This makes user objects display well when printed
     def __repr__(self):
