@@ -55,11 +55,7 @@ We believe health is a journey best shared! While this is currently a personal p
 If you have a feature request or found a bug, please open an issue.
 
 Feel free to fork this project and adapt it for your own use.
-
-  License
-.
-
-    Disclaimer
+  Disclaimer
 This tool is intended for general informational purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition or before starting any new fitness or nutrition program.
 
 
