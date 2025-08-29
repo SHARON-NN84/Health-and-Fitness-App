@@ -1,16 +1,18 @@
+
+
 # Import database building blocks from SQLAlchemy
-from sqlalchemy import Column, Integer, String, Float, DateTime, Text, ForeignKey , create_engine  # For creating tables and columns
+from sqlalchemy import Column, Integer, String, Float, DateTime, Text, ForeignKey, create_engine  # For creating tables and columns
 from sqlalchemy.ext.declarative import declarative_base  # For creating our table classes
-from sqlalchemy.orm import relationship, sessionmaker  # connecting tables together
-from datetime import datetime  #  handling dates and times
+from sqlalchemy.orm import relationship, sessionmaker  # Connecting tables together
+from datetime import datetime  # Handling dates and times
 
-
-# This is the fondation for all table classes
+# This is the foundation for all table classes
 Base = declarative_base()
 engine = create_engine('sqlite:///health_fitness.db')
 SessionLocal = sessionmaker(bind=engine)
 session = SessionLocal()
-# USER TABLE - Stores infor about each person using the app
+
+# USER TABLE - Stores info about each person using the app
 class User(Base):
     __tablename__ = 'users'  # Actual table name in database
     
@@ -22,10 +24,15 @@ class User(Base):
     height = Column(Float, nullable=False) 
     created_at = Column(DateTime, default=datetime.now)  # When user was created (auto-filled)
     
+    # RELATIONSHIPS
+    nutrition_entries = relationship("Nutrition", back_populates="user", cascade="all, delete-orphan")
+    exercise_sessions = relationship("Exercise", back_populates="user", cascade="all, delete-orphan")
+    health_metrics = relationship("HealthMetric", back_populates="user", cascade="all, delete-orphan")
+    
     # This makes user objects display well when printed
     def __repr__(self):
         return f"<User(name='{self.name}', age={self.age}, weight={self.weight}, height={self.height})>"
-    
+
 # NUTRITION TABLE - Tracks what users eat
 class Nutrition(Base):
     __tablename__ = 'nutrition'
@@ -44,8 +51,8 @@ class Nutrition(Base):
     
     def __repr__(self):
         return f"<Nutrition(food='{self.food}', calories={self.calories}, timestamp={self.timestamp})>"
-    
-   # EXERCISE TABLE - Tracks workout sessions
+
+# EXERCISE TABLE - Tracks workout sessions
 class Exercise(Base):
     __tablename__ = 'exercise'
     
@@ -62,8 +69,8 @@ class Exercise(Base):
     
     def __repr__(self):
         return f"<Exercise(type='{self.type}', duration={self.duration}, calories_burned={self.calories_burned})>"
-    
-    # HEALTH METRICS TABLE - Tracks health measurements over time
+
+# HEALTH METRICS TABLE - Tracks health measurements over time
 class HealthMetric(Base):
     __tablename__ = 'health_metrics'
     

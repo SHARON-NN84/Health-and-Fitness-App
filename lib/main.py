@@ -1,6 +1,12 @@
+
+
 import click
 
-from crud.crud import create_user, get_user, get_all_users, update_user, delete_user
+from crud.crud import (
+    create_user, get_user, get_all_users, 
+    update_user, delete_user, get_nutrition_entries, 
+    add_nutrition_entry, get_exercise_sessions, add_exercise_session,
+    get_health_metrics, add_health_metric)
 
 while True:
     click.secho("Welcome to Health & Fitness Tracker", fg='blue')
@@ -56,17 +62,76 @@ while True:
         click.secho("Nutrition Options", fg='green')
         click.secho("1. Add Nutrition Entry", fg='green')
         click.secho("2. View Nutrition Entries", fg='yellow')
-        # Add Nutrition logic here
+
+        nutrition_option = click.prompt("Select Nutrition Option", type=int)
+
+        if nutrition_option == 1:
+            click.secho("Adding Nutrition Entry...", fg="yellow")
+            user_id = click.prompt("Enter User ID", type=int)
+            food = click.prompt("Enter Food Name")
+            calories = click.prompt("Enter Calories", type=float)
+            protein = click.prompt("Enter Protein (g)", type=float, default=0.0)
+            carbs = click.prompt("Enter Carbohydrates (g)", type=float, default=0.0)
+            fat = click.prompt("Enter Fat (g)", type=float, default=0.0)
+            entry = add_nutrition_entry(user_id, food, calories, protein, carbs, fat)
+            click.secho(f"Added Nutrition Entry: {entry.food} ({entry.calories} kcal)", fg="blue")
+
+        elif nutrition_option == 2:
+            user_id = click.prompt("Enter User ID", type=int)
+            date_str = click.prompt("Enter Date (YYYY-MM-DD) or press Enter for all", default="", show_default=False)
+            entries = get_nutrition_entries(user_id, date_str if date_str else None)
+            for e in entries:
+                click.secho(f"{e.timestamp} - {e.food}: {e.calories} kcal, P:{e.protein}g C:{e.carbs}g F:{e.fat}g", fg="blue")
+
 
     elif user_input == 3:
         click.secho("Exercise Options", fg='green')
-        click.secho("1. Add Exercise Entry", fg='green')
-        click.secho("2. View Exercise Entries", fg='yellow')
-        # Add Exercise logic here
+        click.secho("1. Add Exercise Session", fg='green')
+        click.secho("2. View Exercise Sessions", fg='yellow')
+
+        exercise_option = click.prompt("Select Exercise Option", type=int)
+
+        if exercise_option == 1:
+            click.secho("Adding Exercise Session...", fg="yellow")
+            user_id = click.prompt("Enter User ID", type=int)
+            type_ = click.prompt("Enter Exercise Type (e.g. Running, Cycling)")
+            duration = click.prompt("Enter Duration (minutes)", type=int)
+            calories_burned = click.prompt("Enter Calories Burned", type=float)
+            notes = click.prompt("Enter Notes", default="")
+            session_entry = add_exercise_session(user_id, type_, duration, calories_burned, notes)
+            click.secho(f"Exercise Added: {session_entry.type}, {session_entry.duration} min, {session_entry.calories_burned} kcal", fg="blue")
+
+        elif exercise_option == 2:
+            user_id = click.prompt("Enter User ID", type=int)
+            date_str = click.prompt("Enter Date (YYYY-MM-DD) or press Enter for all", default="", show_default=False)
+            sessions = get_exercise_sessions(user_id, date_str if date_str else None)
+            for s in sessions:
+                click.secho(f"{s.timestamp} - {s.type}: {s.duration} min, {s.calories_burned} kcal", fg="blue")
+
 
     elif user_input == 4:
         click.secho("Viewing Daily Summary...", fg='green')
-        # Add summary logic here
+        user_id = click.prompt("Enter User ID", type=int)
+        date_str = click.prompt("Enter Date (YYYY-MM-DD)", type=str)
+
+        nutrition_entries = get_nutrition_entries(user_id, date_str)
+        exercise_sessions = get_exercise_sessions(user_id, date_str)
+        health_metrics = get_health_metrics(user_id, date_str)
+
+        # Summaries
+        total_calories_in = sum(n.calories for n in nutrition_entries)
+        total_calories_out = sum(e.calories_burned for e in exercise_sessions)
+
+        click.secho("------ DAILY SUMMARY ------", fg="cyan")
+        click.secho(f"Nutrition: {len(nutrition_entries)} entries, {total_calories_in} kcal consumed", fg="blue")
+        click.secho(f"Exercise: {len(exercise_sessions)} sessions, {total_calories_out} kcal burned", fg="blue")
+
+        if health_metrics:
+            latest = health_metrics[0]
+            click.secho(f"Latest Health Metric: Weight={latest.weight}kg, BP={latest.blood_pressure}, HR={latest.heart_rate}", fg="blue")
+        else:
+            click.secho("No health metrics recorded.", fg="red")
+
 
     elif user_input == 5:
         click.secho("Exiting Health & Fitness Tracker. Goodbye!", fg='yellow')
